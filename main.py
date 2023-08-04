@@ -33,11 +33,6 @@ def getTagIndex(tags, tag):
     return num
 
 def main():
-    if (len(sys.argv) >= 2):
-        inputPath = sys.argv[1]
-    if (len(sys.argv) >= 3):
-        outputPath = sys.argv[2]
-
     imageExtensionList = [
         '.png',
         '.jpg',
@@ -45,6 +40,11 @@ def main():
     ]
     inputPath = "./in"
     outputPath = "./out"
+
+    if (len(sys.argv) >= 2):
+        inputPath = sys.argv[1]
+    if (len(sys.argv) >= 3):
+        outputPath = sys.argv[2]
 
     print(inputPath)
     print(outputPath)
@@ -117,11 +117,14 @@ def main():
             # yolo v7 移行のアノテーション規則に沿って計算
             # 画像の真ん中の座標と x y それぞれの幅を計算
             # https://qiita.com/yumi1123/items/ec023010ceeb05c2d73e 参考
-            width = (region['points'][2]['x'] - region['points'][0]['x']) / asset['size']['width']
-            height = (region['points'][2]['y'] - region['points'][0]['y']) / asset['size']['height']
+            width = (region['points'][2]['x'] - region['points'][0]['x'])
+            height = (region['points'][2]['y'] - region['points'][0]['y'])
 
             centerPointX = (region['points'][0]['x'] + (width / 2)) / asset['size']['width']
             centerPointY = (region['points'][0]['y'] + (height / 2)) / asset['size']['height']
+
+            width = width / asset['size']['width']
+            height =height / asset['size']['height']
 
             logging.debug(
                 'Export Label text - ' +
@@ -149,11 +152,14 @@ def main():
             # yolo v7 移行のアノテーション規則に沿って計算
             # 画像の真ん中の座標と x y それぞれの幅を計算
             # https://qiita.com/yumi1123/items/ec023010ceeb05c2d73e 参考
-            width = (region['points'][2]['x'] - region['points'][0]['x']) / asset['size']['width']
-            height = (region['points'][2]['y'] - region['points'][0]['y']) / asset['size']['height']
+            width = (region['points'][2]['x'] - region['points'][0]['x'])
+            height = (region['points'][2]['y'] - region['points'][0]['y'])
 
             centerPointX = (region['points'][0]['x'] + (width / 2)) / asset['size']['width']
             centerPointY = (region['points'][0]['y'] + (height / 2)) / asset['size']['height']
+            
+            width = width / asset['size']['width']
+            height = height / asset['size']['height']
 
             logging.debug(
                 'Export Label text - ' +
