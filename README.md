@@ -1,0 +1,2 @@
+# vott-to-yolo
+microsoft社製のvottでラベル付けを行ったアノテーションをyolo v7以降の転移学習用のデータに変換するスクリプト
