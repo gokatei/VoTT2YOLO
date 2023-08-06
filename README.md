@@ -21,6 +21,7 @@ python main.py ./test-data/vott-json-export
 python main.py ./test-data/vott-json-export -o ./out
 ```
 このようにすると基本的な使い方と同じ内容が`./out`へ出力されるようになります。<br>
+引数なしのデフォルト出力先は`./output`です。<br>
 
 ### バリデーションデータの参照設定
 ```sh
@@ -28,6 +29,7 @@ python main.py ./test-data/vott-json-export -v 0.5
 ```
 このようにすると元データから50%の確率でバリデーションデータを参照して出力します。<br>
 0-1の小数点で設定可能です。(0に設定した場合以下の`false`と同様の動作をします)<br>
+引数なしのデフォルト確率は`0.3`です。<br>
 ```sh
 python main.py ./test-data/vott-json-export -v false
 ```
