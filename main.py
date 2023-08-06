@@ -1,3 +1,4 @@
+import argparse
 import sys
 import os
 import shutil
@@ -10,19 +11,22 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s:%(name)s - %(message)s")
 
 def outFolderInit(outputPath):
-    if not(os.path.isdir(os.path.join(outputPath, 'images', 'train'))):
-        os.makedirs(os.path.join(outputPath, 'images', 'train'))
-        logging.debug('Create folder: '+os.path.join(outputPath, 'images', 'train'))
-    if not(os.path.isdir(os.path.join(outputPath, 'images', 'val'))):
-        os.makedirs(os.path.join(outputPath, 'images', 'val'))
-        logging.debug('Create folder: '+os.path.join(outputPath, 'images', 'val'))
+    pathList = {
+        "images": [
+            "train",
+            "val"
+        ],
+        "labels": [
+            "train",
+            "val"
+        ]
+    }
 
-    if not(os.path.isdir(os.path.join(outputPath, 'labels', 'train'))):
-        os.makedirs(os.path.join(outputPath, 'labels', 'train'))
-        logging.debug('Create folder: '+os.path.join(outputPath, 'labels', 'train'))
-    if not(os.path.isdir(os.path.join(outputPath, 'labels', 'val'))):
-        os.makedirs(os.path.join(outputPath, 'labels', 'val'))
-        logging.debug('Create folder: '+os.path.join(outputPath, 'labels', 'val'))
+    for pathName in pathList:
+        for _pathName in pathList[pathName]:
+            if not(os.path.isdir(os.path.join(outputPath, pathName, _pathName))):
+                os.makedirs(os.path.join(outputPath, pathName, _pathName))
+                logging.debug('Create folder: '+os.path.join(outputPath, pathName, _pathName))
 
 def getTagIndex(tags, tag):
     num = 0
@@ -32,53 +36,60 @@ def getTagIndex(tags, tag):
         num += 1
     return num
 
-def main():
+def randomFloat(prob):
+    if prob == False:
+        return False
+    if not 0 <= prob <= 1:
+        return None
+    if random.random() <= prob:
+        return True
+    else:
+        return False
+
+
+def main(args):
     imageExtensionList = [
         '.png',
         '.jpg',
         '.jpeg'
     ]
-    inputPath = "./in"
-    outputPath = "./out"
 
-    if (len(sys.argv) >= 2):
-        inputPath = sys.argv[1]
-    if (len(sys.argv) >= 3):
-        outputPath = sys.argv[2]
-
-    print(inputPath)
-    print(outputPath)
-
-    if not(os.path.isdir(inputPath)):
-        logging.error("入力パスを確認してください")
+    if not(os.path.isdir(args.input)):
+        logging.error('Please check input path.')
         exit()
-    if not(os.path.isdir(outputPath)):
-        logging.error("出力パスを確認してください")
-        exit()
+    if not(os.path.isdir(args.output)):
+        try:
+            os.makedirs(args.output)
+        except:
+            logging.error('Please check output path.')
+            exit()
 
     jsonFileList = []
     imageList = []
     logging.info("Loading Files....")
-    for fileName in os.listdir(inputPath):
+    for fileName in os.listdir(args.input):
         logging.debug(fileName)
-        if os.path.isfile(os.path.join(inputPath, fileName)) & fileName.endswith('export.json'):
+        if os.path.isfile(os.path.join(args.input, fileName)) & fileName.endswith('export.json'):
             jsonFileList.append(fileName)
         
         for imageExtension in imageExtensionList:
-            if os.path.isfile(os.path.join(inputPath, fileName)) & fileName.endswith(imageExtension):
+            if os.path.isfile(os.path.join(args.input, fileName)) & fileName.endswith(imageExtension):
                 imageList.append(fileName)
                 
     if (len(jsonFileList) != 1):
-        logging.error("入力ファイルを確認してください")
+        logging.error('Please check input files.')
         exit()
 
     # 入力JSON読み込み
     annotationJSON = {}
-    with open(os.path.join(inputPath, jsonFileList[0])) as jsonFile:
+    with open(os.path.join(args.input, jsonFileList[0])) as jsonFile:
         annotationJSON = json.load(jsonFile)
-        
+    
+    if args.suffix: # 被らないようにサフィックス付けるやつ
+        annotationJSON['name'] = annotationJSON['name'] + "-" + args.suffix
+    
     logging.info('Check output folder...')
-    outputPath = os.path.join(outputPath, annotationJSON['name']+'-annotation')
+    outputPath = os.path.join(args.output, annotationJSON['name'])
     outFolderInit(outputPath) # 出力先フォルダの生成
 
     # 学習データ指定用yaml出力
@@ -86,22 +97,51 @@ def main():
     for tagData in annotationJSON['tags']:
         tagNames.append(tagData['name'])
     yamlData = {
-        'train': '[train path hear]/images/train/',
-        'val': '[val path hear]/images/val/',
+        'train': f"./data/{annotationJSON['name']}/images/train/",
+        'val': f"./data/{annotationJSON['name']}/images/val/",
         'nc': len(annotationJSON['tags']),
         'names': tagNames
     }
-    with open(os.path.join(outputPath, annotationJSON['name']+'-annotation.yaml'), 'w') as yamlFile:
+    with open(os.path.join(outputPath, 'data.yaml'), 'w') as yamlFile:
         yaml.dump(yamlData, yamlFile, encoding='utf-8', allow_unicode=True)
+    
+    # 転移学習用スクリプト生成
+    with open(os.path.join(outputPath, 'yolov7-train-start.sh'), 'w') as startScript:
+        startScript.write('# Please customize as needed!\n')
+        startScript.write('cd ../../\n')
+        startScript.write(
+            "python3 train.py --workers 4 \\\n"+
+            "--device 0 \\\n"+
+            "--batch-size 32 \\\n"+
+            f"--data ./data/{annotationJSON['name']}/data.yaml \\\n"+
+            "--img 640 640 \\\n"+
+            "--cfg cfg/training/yolov7.yaml \\\n"+
+            "--weights 'yolov7.pt' \\\n"+
+            f"--name {annotationJSON['name']} \\\n"+
+            "--hyp data/hyp.scratch.p6.yaml \\\n"+
+            "--epochs 200"
+            )
+    with open(os.path.join(outputPath, 'yolov7-train-start.bat'), 'w') as startScript:
+        startScript.write('REM Please customize as needed!\n')
+        startScript.write('cd ../../\n')
+        startScript.write(
+            "python train.py --workers 4 ^\n"+
+            "--device 0 ^\n"+
+            "--batch-size 32 ^\n"+
+            f"--data ./data/{annotationJSON['name']}/data.yaml ^\n"+
+            "--img 640 640 ^\n"+
+            "--cfg cfg/training/yolov7.yaml ^\n"+
+            "--weights 'yolov7.pt' ^\n"+
+            f"--name {annotationJSON['name']} ^\n"+
+            "--hyp data/hyp.scratch.p6.yaml ^\n"+
+            "--epochs 200"
+            )
 
     # 画像やラベルのパス
     outTrainImagePath = os.path.join(outputPath, 'images', 'train')
     outTrainLabelPath = os.path.join(outputPath, 'labels', 'train')
     outValImagePath = os.path.join(outputPath, 'images', 'val')
     outValLabelPath = os.path.join(outputPath, 'labels', 'val')
-    
-
-
 
     logging.info('Export Label texts and Copy Images...')
 
@@ -111,7 +151,7 @@ def main():
             continue
         asset = annotationJSON['assets'][assetId]['asset']
         logging.debug('Copy Image - ' + asset['name'])
-        shutil.copyfile(os.path.join(inputPath, asset['name']), os.path.join(outTrainImagePath, asset['name']))
+        shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outTrainImagePath, asset['name']))
         for region in annotationJSON['assets'][assetId]['regions']: # 各画像の指定範囲
 
             # yolo v7 移行のアノテーション規則に沿って計算
@@ -142,11 +182,11 @@ def main():
     for assetId in annotationJSON['assets']:
         if (len(annotationJSON['assets'][assetId]['regions']) <= 0): # タグ指定ない画像は飛ばす
             continue
-        if random.randrange(2) == 1: # 1/2 の確率でデータを取る
+        if not randomFloat(args.valPercent): # 指定した確率で出力
             continue
         asset = annotationJSON['assets'][assetId]['asset']
         logging.debug('Copy Image - ' + asset['name'])
-        shutil.copyfile(os.path.join(inputPath, asset['name']), os.path.join(outValImagePath, asset['name']))
+        shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outValImagePath, asset['name']))
         for region in annotationJSON['assets'][assetId]['regions']: # 各画像の指定範囲
 
             # yolo v7 移行のアノテーション規則に沿って計算
@@ -174,6 +214,22 @@ def main():
 
     logging.info('DONE')
 
-if __name__ == "__main__": 
-    logging.info("Start MAIN")
-    main()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='VoTT2YOLO')
+    parser.add_argument('input', help='Set input directory')
+    # parser.add_argument('-i', '--input', help='Set input directory', default='./input')
+    parser.add_argument('-o', '--output', help='Set output directory', default='./output')
+    parser.add_argument('-v', '--valPercent', help='Validation Percentage - Specified float of between "0-1". Disable the output of validation data with "false" or "0".', default=0.3)
+    parser.add_argument('-s', '--suffix', help='Add a suffix to avoid duplication of saves.')
+    args = parser.parse_args()
+
+    if (args.valPercent == 'false'):
+        args.valPercent = False
+    else:
+        args.valPercent = float(args.valPercent)
+    if (randomFloat(args.valPercent)) == None:
+        logging.error('Please input valPercent is float of between 0-1.')
+        exit()
+    logging.debug(args)
+    logging.debug("Start MAIN")
+    main(args)
