@@ -3,7 +3,7 @@ microsoft社製のvottでラベル付けを行ったアノテーションをyolo
 
 # How To Use
 現在サポートしているバージョンは YOLOv7 のみですので v8 を利用する方はファイルを各自設定してご利用ください。
-## YOLOv7
+## 変換方法
 ### 事前準備
 まず以下のコマンドを実行して必要なモジュールをインストールします。<br>
 ```sh
@@ -50,3 +50,8 @@ input
 --valPercent -v (0-1 の小数点で)
 --suffix -s
 ```
+
+## YOLOv7 での使い方
+出力されたフォルダを(YOLOv7の場合)YOLOのrootディレクトリ内(`train.py`と同じ階層)にある`data`フォルダ内に移動します。<br>
+その後`yolov7-train-start.sh`(Linux)および`yolov7-train-start.bat`(Windows)を実行すればすぐに転移学習が可能です。<br>
+それぞれのスクリプトは編集可能ですので各自で設定して利用してください。<br>
