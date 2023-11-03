@@ -82,7 +82,7 @@ def main(args):
 
     # 入力JSON読み込み
     annotationJSON = {}
-    with open(os.path.join(args.input, jsonFileList[0])) as jsonFile:
+    with open(os.path.join(args.input, jsonFileList[0]), 'r', encoding="utf-8") as jsonFile:
         annotationJSON = json.load(jsonFile)
     
     if args.suffix: # 被らないようにサフィックス付けるやつ
