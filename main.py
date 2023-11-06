@@ -102,11 +102,11 @@ def main(args):
         'nc': len(annotationJSON['tags']),
         'names': tagNames
     }
-    with open(os.path.join(outputPath, 'data.yaml'), 'w') as yamlFile:
+    with open(os.path.join(outputPath, 'data.yaml'), 'w', encoding="utf-8") as yamlFile:
         yaml.dump(yamlData, yamlFile, encoding='utf-8', allow_unicode=True)
     
     # 転移学習用スクリプト生成
-    with open(os.path.join(outputPath, 'yolov7-train-start.sh'), 'w') as startScript:
+    with open(os.path.join(outputPath, 'yolov7-train-start.sh'), 'w', encoding="utf-8") as startScript:
         startScript.write('# Please customize as needed!\n')
         startScript.write('cd ../../\n')
         startScript.write(
@@ -121,7 +121,7 @@ def main(args):
             "--hyp data/hyp.scratch.p6.yaml \\\n"+
             "--epochs 200"
             )
-    with open(os.path.join(outputPath, 'yolov7-train-start.bat'), 'w') as startScript:
+    with open(os.path.join(outputPath, 'yolov7-train-start.bat'), 'w', encoding="utf-8") as startScript:
         startScript.write('REM Please customize as needed!\n')
         startScript.write('cd ../../\n')
         startScript.write(
@@ -172,7 +172,7 @@ def main(args):
                 f"\n{centerPointX} {centerPointY} {width} {height}\n"
                 )
 
-            with open(os.path.join(outTrainLabelPath, os.path.basename(asset['name']).split('.', 1)[0] + '.txt'), mode='w') as labelFile:
+            with open(os.path.join(outTrainLabelPath, os.path.basename(asset['name']).split('.', 1)[0] + '.txt'), 'w', encoding="utf-8") as labelFile:
                 for tag in region['tags']: # 各画像の指定範囲に割り当てられたTAG(一個の指定範囲に複数TAGがあることもあり得る)
                     tagNum = getTagIndex(annotationJSON['tags'], tag) # tagが何番か
                     labelFile.write(f"{tagNum} {centerPointX} {centerPointY} {width} {height}\n")
@@ -207,7 +207,7 @@ def main(args):
                 f"\n{centerPointX} {centerPointY} {width} {height}\n"
                 )
 
-            with open(os.path.join(outValLabelPath, os.path.basename(asset['name']).split('.', 1)[0] + '.txt'), mode='w') as labelFile:
+            with open(os.path.join(outValLabelPath, os.path.basename(asset['name']).split('.', 1)[0] + '.txt'), 'w', encoding="utf-8") as labelFile:
                 for tag in region['tags']: # 各画像の指定範囲に割り当てられたTAG(一個の指定範囲に複数TAGがあることもあり得る)
                     tagNum = getTagIndex(annotationJSON['tags'], tag) # tagが何番か
                     labelFile.write(f"{tagNum} {centerPointX} {centerPointY} {width} {height}\n")
