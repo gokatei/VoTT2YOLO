@@ -106,7 +106,7 @@ def main(args):
         yaml.dump(yamlData, yamlFile, encoding='utf-8', allow_unicode=True)
     
     # 転移学習用スクリプト生成
-    with open(os.path.join(outputPath, 'yolov7-train-start.sh'), 'w', encoding="utf-8") as startScript:
+    with open(os.path.join(outputPath, 'yolov7-train-start.sh'), 'w', encoding="utf-8", newline="\n") as startScript:
         startScript.write('# Please customize as needed!\n')
         startScript.write('cd ../../\n')
         startScript.write(
