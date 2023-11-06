@@ -111,30 +111,30 @@ def main(args):
         startScript.write('cd ../../\n')
         startScript.write(
             "python3 train.py --workers 4 \\\n"+
-            "--device 0 \\\n"+
-            "--batch-size 32 \\\n"+
-            f"--data ./data/{annotationJSON['name']}/data.yaml \\\n"+
-            "--img 640 640 \\\n"+
-            "--cfg cfg/training/yolov7.yaml \\\n"+
-            "--weights 'yolov7.pt' \\\n"+
-            f"--name {annotationJSON['name']} \\\n"+
-            "--hyp data/hyp.scratch.p6.yaml \\\n"+
-            "--epochs 200"
+            "    --device 0 \\\n"+
+            "    --batch-size 32 \\\n"+
+            f"    --data ./data/{annotationJSON['name']}/data.yaml \\\n"+
+            "    --img 640 640 \\\n"+
+            "    --cfg cfg/training/yolov7.yaml \\\n"+
+            "    --weights 'yolov7.pt' \\\n"+
+            f"    --name {annotationJSON['name']} \\\n"+
+            "    --hyp data/hyp.scratch.p6.yaml \\\n"+
+            "    --epochs 200"
             )
     with open(os.path.join(outputPath, 'yolov7-train-start.bat'), 'w', encoding="utf-8") as startScript:
         startScript.write('REM Please customize as needed!\n')
         startScript.write('cd ../../\n')
         startScript.write(
-            "python train.py --workers 4 ^\n"+
-            "--device 0 ^\n"+
-            "--batch-size 32 ^\n"+
-            f"--data ./data/{annotationJSON['name']}/data.yaml ^\n"+
-            "--img 640 640 ^\n"+
-            "--cfg cfg/training/yolov7.yaml ^\n"+
-            "--weights 'yolov7.pt' ^\n"+
-            f"--name {annotationJSON['name']} ^\n"+
-            "--hyp data/hyp.scratch.p6.yaml ^\n"+
-            "--epochs 200"
+            "py train.py --workers 4 ^\n"+
+            "    --device 0 ^\n"+
+            "    --batch-size 32 ^\n"+
+            f"    --data ./data/{annotationJSON['name']}/data.yaml ^\n"+
+            "    --img 640 640 ^\n"+
+            "    --cfg cfg/training/yolov7.yaml ^\n"+
+            "    --weights 'yolov7.pt' ^\n"+
+            f"    --name {annotationJSON['name']} ^\n"+
+            "    --hyp data/hyp.scratch.p6.yaml ^\n"+
+            "    --epochs 200"
             )
 
     # 画像やラベルのパス
