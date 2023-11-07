@@ -118,7 +118,7 @@ def main(args):
             "    --cfg cfg/training/yolov7.yaml \\\n"+
             "    --weights 'yolov7_training.pt' \\\n"+
             f"    --name {annotationJSON['name']} \\\n"+
-            "    --hyp data/hyp.scratch.p6.yaml \\\n"+
+            "    --hyp data/hyp.scratch.custom.yaml \\\n"+
             "    --epochs 200"
             )
     with open(os.path.join(outputPath, 'yolov7-train-start.bat'), 'w', encoding="utf-8") as startScript:
@@ -133,7 +133,7 @@ def main(args):
             "    --cfg cfg/training/yolov7.yaml ^\n"+
             "    --weights 'yolov7_training.pt' ^\n"+
             f"    --name {annotationJSON['name']} ^\n"+
-            "    --hyp data/hyp.scratch.p6.yaml ^\n"+
+            "    --hyp data/hyp.scratch.custom.yaml ^\n"+
             "    --epochs 200"
             )
 
