@@ -116,7 +116,7 @@ def main(args):
             f"    --data ./data/{annotationJSON['name']}/data.yaml \\\n"+
             "    --img 640 640 \\\n"+
             "    --cfg cfg/training/yolov7.yaml \\\n"+
-            "    --weights 'yolov7.pt' \\\n"+
+            "    --weights 'yolov7_training.pt' \\\n"+
             f"    --name {annotationJSON['name']} \\\n"+
             "    --hyp data/hyp.scratch.p6.yaml \\\n"+
             "    --epochs 200"
@@ -131,7 +131,7 @@ def main(args):
             f"    --data ./data/{annotationJSON['name']}/data.yaml ^\n"+
             "    --img 640 640 ^\n"+
             "    --cfg cfg/training/yolov7.yaml ^\n"+
-            "    --weights 'yolov7.pt' ^\n"+
+            "    --weights 'yolov7_training.pt' ^\n"+
             f"    --name {annotationJSON['name']} ^\n"+
             "    --hyp data/hyp.scratch.p6.yaml ^\n"+
             "    --epochs 200"
