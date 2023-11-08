@@ -229,7 +229,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', help='Set output directory', default='./output')
     parser.add_argument('-v', '--valPercent', help='Validation Percentage - Specified float of between "0-1". Disable the output of validation data with "false" or "0".', default=0.3)
     parser.add_argument('-s', '--suffix', help='Add a suffix to avoid duplication of saves.')
-    parser.add_argument('-is', '--imageSuffix', help='Add a suffix to images and labels.')
+    parser.add_argument('-as', '--assetSuffix', help='Add a suffix to images and labels.')
     args = parser.parse_args()
 
     if (args.valPercent == 'false'):
