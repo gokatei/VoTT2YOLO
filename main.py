@@ -86,7 +86,7 @@ def main(args):
         annotationJSON = json.load(jsonFile)
     
     if args.suffix: # 被らないようにサフィックス付けるやつ
-        annotationJSON['name'] = annotationJSON['name'] + "-" + args.suffix
+        annotationJSON['name'] = annotationJSON['name'] + '-' + args.suffix
     
     logging.info('Check output folder...')
     outputPath = os.path.join(args.output, annotationJSON['name'])
@@ -151,7 +151,11 @@ def main(args):
             continue
         asset = annotationJSON['assets'][assetId]['asset']
         logging.debug('Copy Image - ' + asset['name'])
-        shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outTrainImagePath, asset['name']))
+
+        outAssetName = asset['name']
+        if args.imageSuffix:
+            outAssetName = os.path.splitext(asset['name'])[0] + '-' + args.imageSuffix + os.path.splitext(asset['name'])[1]
+        shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outTrainImagePath, outAssetName))
         for region in annotationJSON['assets'][assetId]['regions']: # 各画像の指定範囲
 
             # yolo v7 移行のアノテーション規則に沿って計算
@@ -168,11 +172,11 @@ def main(args):
 
             logging.debug(
                 'Export Label text - ' +
-                os.path.basename(asset['name']).split('.', 1)[0] + '.txt'+
+                os.path.basename(outAssetName).split('.', 1)[0] + '.txt'+
                 f"\n{centerPointX} {centerPointY} {width} {height}\n"
                 )
 
-            with open(os.path.join(outTrainLabelPath, os.path.basename(asset['name']).split('.', 1)[0] + '.txt'), 'w', encoding="utf-8") as labelFile:
+            with open(os.path.join(outTrainLabelPath, os.path.basename(outAssetName).split('.', 1)[0] + '.txt'), 'w', encoding="utf-8") as labelFile:
                 for tag in region['tags']: # 各画像の指定範囲に割り当てられたTAG(一個の指定範囲に複数TAGがあることもあり得る)
                     tagNum = getTagIndex(annotationJSON['tags'], tag) # tagが何番か
                     labelFile.write(f"{tagNum} {centerPointX} {centerPointY} {width} {height}\n")
@@ -186,7 +190,11 @@ def main(args):
             continue
         asset = annotationJSON['assets'][assetId]['asset']
         logging.debug('Copy Image - ' + asset['name'])
-        shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outValImagePath, asset['name']))
+
+        outAssetName = asset['name']
+        if args.imageSuffix:
+            outAssetName = os.path.splitext(asset['name'])[0] + '-' + args.imageSuffix + os.path.splitext(asset['name'])[1]
+        shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outValImagePath, outAssetName))
         for region in annotationJSON['assets'][assetId]['regions']: # 各画像の指定範囲
 
             # yolo v7 移行のアノテーション規則に沿って計算
@@ -203,11 +211,11 @@ def main(args):
 
             logging.debug(
                 'Export Label text - ' +
-                os.path.basename(asset['name']).split('.', 1)[0] + '.txt'+
+                os.path.basename(outAssetName).split('.', 1)[0] + '.txt'+
                 f"\n{centerPointX} {centerPointY} {width} {height}\n"
                 )
 
-            with open(os.path.join(outValLabelPath, os.path.basename(asset['name']).split('.', 1)[0] + '.txt'), 'w', encoding="utf-8") as labelFile:
+            with open(os.path.join(outValLabelPath, os.path.basename(outAssetName).split('.', 1)[0] + '.txt'), 'w', encoding="utf-8") as labelFile:
                 for tag in region['tags']: # 各画像の指定範囲に割り当てられたTAG(一個の指定範囲に複数TAGがあることもあり得る)
                     tagNum = getTagIndex(annotationJSON['tags'], tag) # tagが何番か
                     labelFile.write(f"{tagNum} {centerPointX} {centerPointY} {width} {height}\n")
@@ -221,6 +229,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', help='Set output directory', default='./output')
     parser.add_argument('-v', '--valPercent', help='Validation Percentage - Specified float of between "0-1". Disable the output of validation data with "false" or "0".', default=0.3)
     parser.add_argument('-s', '--suffix', help='Add a suffix to avoid duplication of saves.')
+    parser.add_argument('-is', '--imageSuffix', help='Add a suffix to images and labels.')
     args = parser.parse_args()
 
     if (args.valPercent == 'false'):
