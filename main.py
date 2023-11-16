@@ -153,8 +153,8 @@ def main(args):
         logging.debug('Copy Image - ' + asset['name'])
 
         outAssetName = asset['name']
-        if args.imageSuffix:
-            outAssetName = os.path.splitext(asset['name'])[0] + '-' + args.imageSuffix + os.path.splitext(asset['name'])[1]
+        if args.assetSuffix:
+            outAssetName = os.path.splitext(asset['name'])[0] + '-' + args.assetSuffix + os.path.splitext(asset['name'])[1]
         shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outTrainImagePath, outAssetName))
         for region in annotationJSON['assets'][assetId]['regions']: # 各画像の指定範囲
 
@@ -192,8 +192,8 @@ def main(args):
         logging.debug('Copy Image - ' + asset['name'])
 
         outAssetName = asset['name']
-        if args.imageSuffix:
-            outAssetName = os.path.splitext(asset['name'])[0] + '-' + args.imageSuffix + os.path.splitext(asset['name'])[1]
+        if args.assetSuffix:
+            outAssetName = os.path.splitext(asset['name'])[0] + '-' + args.assetSuffix + os.path.splitext(asset['name'])[1]
         shutil.copyfile(os.path.join(args.input, asset['name']), os.path.join(outValImagePath, outAssetName))
         for region in annotationJSON['assets'][assetId]['regions']: # 各画像の指定範囲
 
