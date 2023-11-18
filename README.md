@@ -37,12 +37,20 @@ python main.py ./test-data/vott-json-export -v false
 個別でバリデーションデータを用意したい場合はこのようにしてください。<br>
 
 ### サフィックス設定
+#### 出力プロジェクト名
 ```sh
 python main.py ./test-data/vott-json-export -s test-1
 ```
 このように設定すると、出力ファイルおよびYOLOでの転移学習時の出力ファイル名へ名前を追加することができます。<br>
 同じデータを数値を変えて保存したい場合に重複しないようにすることが可能です。<br>
 読み込んだVoTTのプロジェクト名が`test-set`の場合`test-set-test-1`といった感じに追加されます。<br>
+
+#### 出力アセット名
+```sh
+python main.py ./test-data/vott-json-export -as test-1
+```
+このように設定すると、出力アセットファイル(ラベルや画像ファイル)名へ名前を追加することができます。<br>
+複数のプロジェクトをマージする際にデータが重複しないようにすることが可能です。<br>
 
 
 ### 引数リスト
@@ -51,6 +59,7 @@ input
 --output -o
 --valPercent -v (0-1 の小数点で)
 --suffix -s
+--asassetSuffix -as
 ```
 
 ## YOLOv7 での使い方
